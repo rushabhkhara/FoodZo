@@ -1,0 +1,21 @@
+{% extends "tourism/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class = "content-section">
+        <form method = "POST" action="{% url 'login' %}">
+            {% csrf_token %}
+                 <b>Email:</b>
+                  <input type="email" name="email" style="margin-top:40px;border-radius:25px"><br><br>
+                  <b>Password:</b>
+                  <input type="password" style="border-radius:25px" name="password" ><br>
+            <div class = "form-group">
+                <button class = "btn btn-outline-info" type="submit">Login</button>
+            </div>
+        </form>
+        <div class = "border-top pt-3">
+            <small class ="text-muted">
+                Need an Account? <a class = "ml-2" href = "{% url 'signUp' %}">Sign Up</a>
+            </small>
+        </div>
+    </div>
+{% endblock content %}

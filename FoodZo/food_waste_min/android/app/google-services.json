@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "469452991715",
+    "firebase_url": "https://foodzo-b3dfa.firebaseio.com",
+    "project_id": "foodzo-b3dfa",
+    "storage_bucket": "foodzo-b3dfa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:469452991715:android:bb5dee91825957c5a029d6",
+        "android_client_info": {
+          "package_name": "com.example.food_waste_min"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "469452991715-bc1ekk20gsagtin3tufj5i8m1vp1evj9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnWbHz81tKE723uQaoh_kfOxiqWlisRpU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "469452991715-bc1ekk20gsagtin3tufj5i8m1vp1evj9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

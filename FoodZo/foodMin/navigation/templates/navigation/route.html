@@ -1,0 +1,191 @@
+{% extends "navigation/base.html" %}
+{% load static %}
+
+
+
+
+<!DOCTYPE html>
+<html>
+{% block content %}
+  <head>
+    <meta charset='utf-8' />
+    <title>Delivery App</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+      }
+	  
+	  .truck {
+		  margin: -10px -10px;
+		  width: 20px;
+		  height: 20px;
+		  border: 2px solid #fff;
+		  border-radius: 50%;
+		  background: #3887be;
+		  pointer-events: none;
+		}
+
+		.marker {
+        background-image: url({% static 'images/marker1.png' %}); 
+        background-size: cover;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      .mapboxgl-popup {
+        max-width: 200px;
+      }
+      .mapboxgl-popup-content {
+        text-align: center;
+        font-family: 'Open Sans', sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+  <br>
+    <div id='map' class='container-fluid'></div>
+    <script>
+      
+
+      // Add your access token
+      mapboxgl.accessToken = 'pk.eyJ1IjoiaXNod2FyMDMwOSIsImEiOiJjanljczduZjEwY2liM2hvNTlkNGx0cHF4In0.IPvpuMu13azuGT0UNOOGnQ';
+
+      // // Initialize a map
+      var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
+        center: [-96,37.8], // starting position
+        zoom: 4 // starting zoom
+      });
+	  
+	  //var warehouse = turf.featureCollection([turf.point(warehouseLocation)]);
+	  //var nothing = turf.featureCollection([turf.point()]);
+	  
+	  map.on('load', function() {
+	  	//alert('Map Loaded');
+	  	$.ajax({
+		    method: 'GET',
+		    url: 'getRoute/', // Django Backend 
+		  }).done(function(data) {
+		  	//alert('done');
+		    // Create a GeoJSON feature collection
+		    var routeGeoJSON = turf.featureCollection([turf.feature(data.trips[0].geometry)]);
+		    // If there is no route provided, reset
+		    //map.getSource('route').setData(routeGeoJSON);
+		    //alert(routeGeoJSON);
+
+		    map.addSource('route', {
+			  type: 'geojson',
+			  data: routeGeoJSON,
+			});
+
+			map.addLayer({ 
+			  id: 'routeline-active',
+			  type: 'line',
+			  source: 'route',
+			  layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			  },
+			  paint: {
+				'line-color': '#3887be',
+				'line-width': [
+				  "interpolate",
+				  ["linear"],
+				  ["zoom"],
+				  12, 3,
+				  22, 12
+				]
+			  }
+			}, 'waterway-label');
+
+
+			map.addLayer({
+			  id: 'routearrows',
+			  type: 'symbol',
+			  source: 'route',
+			  layout: {
+			    'symbol-placement': 'line',
+			    'text-field': '▶',
+			    'text-size': [
+			      "interpolate",
+			      ["linear"],
+			      ["zoom"],
+			      12, 24,
+			      22, 60
+			    ],
+			    'symbol-spacing': [
+			      "interpolate",
+			      ["linear"],
+			      ["zoom"],
+			      12, 30,
+			      22, 160
+			    ],
+			    'text-keep-upright': false
+			  },
+			  paint: {
+			    'text-color': '#3887be',
+			    'text-halo-color': 'hsl(55, 11%, 96%)',
+			    'text-halo-width': 3
+			  }
+			}, 'waterway-label');
+
+
+
+		    if (data.waypoints.length === 12) {
+		      window.alert('Maximum number of points reached. Read more at docs.mapbox.com/api/navigation/#optimization.');
+		    }
+		  });
+
+		  $.ajax({
+		    method: 'GET',
+		    url: 'getMarker/', // Django Backend 
+		  }).done(function(data) {
+		  	console.log(data);
+		  	var geojson = data;
+			geojson.features.forEach(function(marker) {
+	        // create a HTML element for each feature
+	        	var el = document.createElement('div');
+	        	el.className = 'marker';
+
+	        // make a marker for each feature and add it to the map
+		        new mapboxgl.Marker(el)
+		          .setLngLat(marker.geometry.coordinates)
+		          .setPopup(
+		            new mapboxgl.Popup({ offset: 25 }) // add popups
+		              .setHTML(
+		                '<h3>' +
+		                  marker.properties.title +
+		                  '</h3><p>' +
+		                  marker.properties.description +
+		                  '</p>'
+		              )
+		          )
+		          .addTo(map);
+	      	});
+		  });
+
+
+		});
+	
+	
+	</script>
+  </body>
+{% endblock content %}
+</html>
